@@ -1,0 +1,47 @@
+[
+  {
+    "name": "HINDI",
+    "iframe": "https://fifa-world-cup-live.pages.dev/hindi.html",
+    "thumbnail": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800"
+  },
+  {
+    "name": "TSN",
+    "iframe": "https://fifa-world-cup-live.pages.dev/tsn.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/TSN.svg/512px-TSN.svg.png"
+  },
+  {
+    "name": "ENGLISH",
+    "iframe": "https://fifa-world-cup-live.pages.dev/english.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/FIFA_World_Cup_2026_logo.svg/512px-FIFA_World_Cup_2026_logo.svg.png"
+  },
+  {
+    "name": "FOX SPORTS",
+    "iframe": "https://fifa-world-cup-live.pages.dev/fox-sports.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/0/0c/Fox_Sports_logo.svg"
+  },
+  {
+    "name": "TELEMUNDO",
+    "iframe": "https://fifa-world-cup-live.pages.dev/telemundo.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/6/62/Telemundo_logo.svg"
+  },
+  {
+    "name": "CAZE TV",
+    "iframe": "https://fifa-world-cup-live.pages.dev/caze-tv.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/YouTube_social_white_square_%282017%29.svg/512px-YouTube_social_white_square_%282017%29.svg.png"
+  },
+  {
+    "name": "SPORTV",
+    "iframe": "https://fifa-world-cup-live.pages.dev/sportv.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/SporTV_logo_2021.svg/512px-SporTV_logo_2021.svg.png"
+  },
+  {
+    "name": "DSPORTS",
+    "iframe": "https://fifa-world-cup-live.pages.dev/dsports.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/DSports_logo.svg/512px-DSports_logo.svg.png"
+  },
+  {
+    "name": "BENIN",
+    "iframe": "https://fifa-world-cup-live.pages.dev/benin.html",
+    "thumbnail": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/Flag_of_Benin.svg/512px-Flag_of_Benin.svg.png"
+  }
+]

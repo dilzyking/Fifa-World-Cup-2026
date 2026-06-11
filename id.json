@@ -43,5 +43,10 @@
     "name": "BENIN",
     "iframe": "https://fifa-world-cup-live.pages.dev/benin.html",
     "thumbnail": "https://www.sportspro.com/wp-content/uploads/2023/03/bein-edit-2.png"
+  },
+  {
+    "name": "IOS",
+    "iframe": "https://fifa-world-cup-live.pages.dev/ios.html",
+    "thumbnail": "https://www.sportspro.com/wp-content/uploads/2023/03/bein-edit-2.png"
   }
 ]

@@ -1,192 +1,137 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cric Tv Sony Liv 2</title>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">
-
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-      background: #000;
-      height: 100vh;
-      width: 100vw;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, sans-serif;
-    }
-    .shaka-video-container {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-    }
-    video {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      object-fit: contain;
-    }
-    .shaka-spinner-container,
-    .shaka-spinner,
-    .shaka-spinner-svg {
-      display: none !important;
-    }
-  </style>
-</head>
-
-<body>
-  <div class="shaka-video-container" data-shaka-player>
-    <video autoplay playsinline preload="metadata"></video>
-  </div>
-
+<!DOCTYPE html>  
+<html>  
+<head>  
+  <meta charset="UTF-8">  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+  <title>FIFA WORLD CUP 2026</title>     
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/shaka-player.ui.min.js" crossorigin="anonymous"></script>  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.7.11/controls.min.css" crossorigin="anonymous">  
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-FMP9REY96D"></script>
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
 
-  shaka.polyfill.installAll();
-  if (!shaka.Player.isBrowserSupported()) return;
-
-  const video = document.querySelector('video');
-  const player = new shaka.Player();
-  await player.attach(video);
-
-  const container = document.querySelector('.shaka-video-container');
-  const ui = new shaka.ui.Overlay(player, container, video);
-
-  ui.configure({
-    controlPanelElements: [
-      'play_pause','time_and_duration','mute','volume',
-      'spacer','language','captions','picture_in_picture',
-      'quality','fullscreen'
-    ],
-    seekBarColors: {
-      base: 'white',
-      buffered: 'red',
-      played: 'green'
-    }
-  });
-
-  // ── defaults ──────────────────────────────────────────────────────────────
-  const COOKIE_URL  = 'https://fifa-world-cup-live.pages.dev/cookie.json';
-  const STREAM_URL  = 'https://jiotvmblive.cdn.jio.com/bpk-tv/ZeeCafeHD_MOB/WDVLive/index.mpd';
-  const DRM_CONFIG  = {
-    clearKeys: {
-      "937e3af54bd55ef4b862296e0319bb80": "8868db6c5e57e4330e9304d18745ea5f"
-    }
-  };
-
-  let cookieHeader = "__hdnea__=st=1781108429~exp=1781130029~acl=/*~hmac=2052023e5055784bb881f8f529f8127e5665d816f021ec965efd1a96a5a51d2";
-  let usingBackupCookie = false;
-
-  // ── Step 1: fetch cookie.json as JSON (not as plain text) ─────────────────
-  async function fetchCookie() {
-    try {
-      const res  = await fetch(COOKIE_URL, { cache: 'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-
-      const contentType = res.headers.get('content-type') || '';
-
-      // Branch A – server returns a JSON object  { "cookie": "...", ... }
-      if (contentType.includes('application/json') || contentType.includes('text/json')) {
-        const data = await res.json();
-        if (data && typeof data.cookie === 'string' && data.cookie.trim()) {
-          return data.cookie.trim();
-        }
-      }
-
-      // Branch B – server may return M3U / plain text with #EXTHTTP lines
-      const text = await res.text();
-
-      // Try JSON parse anyway (some servers send wrong content-type)
-      try {
-        const data = JSON.parse(text);
-        if (data && typeof data.cookie === 'string' && data.cookie.trim()) {
-          return data.cookie.trim();
-        }
-      } catch (_) { /* not JSON */ }
-
-      // Try M3U #EXTHTTP cookie extraction (search for any channel entry)
-      const lines = text.split('\n');
-      for (let i = 0; i < lines.length; i++) {
-        if (lines[i].startsWith('#EXTHTTP:')) {
-          const m = lines[i].match(/"cookie"\s*:\s*"([^"]+)"/);
-          if (m && m[1].trim()) return m[1].trim();
-        }
-      }
-
-      console.warn('[cookie] Could not extract cookie from response');
-    } catch (err) {
-      console.warn('[cookie] Fetch failed:', err.message);
-    }
-    return null; // caller keeps the default
-  }
-
-  // ── Step 2: fetch cookie BEFORE loading the stream ────────────────────────
-  const fetched = await fetchCookie();
-  if (fetched) {
-    cookieHeader = fetched;
-    console.log('[cookie] Using fetched cookie');
-  } else {
-    console.log('[cookie] Using fallback/default cookie');
-  }
-
-  // ── Step 3: configure DRM + network filters ───────────────────────────────
-  player.configure({ drm: DRM_CONFIG });
-
-  player.getNetworkingEngine().registerRequestFilter((type, request) => {
-    request.headers['Referer']    = 'https://www.jiotv.com/';
-    request.headers['User-Agent'] = 'plaYtv/7.1.5 (Linux;Android 13) ExoPlayerLib/2.11.6';
-    request.headers['Cookie']     = cookieHeader;
-
-    if (
-      (type === shaka.net.NetworkingEngine.RequestType.MANIFEST ||
-       type === shaka.net.NetworkingEngine.RequestType.SEGMENT) &&
-      request.uris[0] &&
-      !request.uris[0].includes('__hdnea')
-    ) {
-      const sep = request.uris[0].includes('?') ? '&' : '?';
-      request.uris[0] += sep + cookieHeader;
-    }
-  });
-
-  // ── Step 4: error handler – retry once with a re-fetched cookie ───────────
-  player.addEventListener('error', async (event) => {
-    const err = event.detail;
-    const RETRY_CODES = new Set([
-      401, 403,
-      shaka.util.Error.Code.BAD_HTTP_STATUS,
-      shaka.util.Error.Code.MANIFEST_UNAVAILABLE,
-      shaka.util.Error.Code.SEGMENT_MISSING,
-    ]);
-
-    if (!usingBackupCookie && RETRY_CODES.has(err.code)) {
-      usingBackupCookie = true;
-      console.warn('[cookie] Stream error', err.code, '– re-fetching cookie and retrying');
-
-      const fresh = await fetchCookie();
-      if (fresh) cookieHeader = fresh;
-
-      try {
-        await player.unload();
-        await player.load(STREAM_URL);
-        video.play();
-      } catch (e) {
-        console.error('[player] Retry failed:', e);
-      }
-    }
-  });
-
-  // ── Step 5: initial load ──────────────────────────────────────────────────
-  try {
-    await player.load(STREAM_URL);
-    video.play();
-  } catch (e) {
-    console.error('[player] Initial load failed:', e);
-  }
-
-});
+  gtag('config', 'G-FMP9REY96D');
 </script>
-</body>
+  <style>  
+   * { margin: 0; padding: 0; box-sizing: border-box; }  
+    html, body {  
+      background: #000;  
+      height: 100vh;  
+      width: 100vw;  
+      overflow: hidden;  
+      font-family: system-ui, -apple-system, sans-serif;  
+    }  
+    .shaka-video-container {  
+      position: absolute;  
+      inset: 0;  
+      width: 100%;  
+      height: 100%;  
+    }  
+    video {  
+      width: 100%;  
+      height: 100%;  
+      background: #000;  
+      object-fit: contain;  
+    }  
+    .shaka-spinner-container,  
+    .shaka-spinner,  
+    .shaka-spinner-svg {  
+      display: none !important;  
+      visibility: hidden !important;  
+      opacity: 0 !important;  
+    }  
+  </style>  
+</head>  
+
+ 
+  
+  <body>  
+  <div class="shaka-video-container" data-shaka-player>  
+    <video autoplay playsinline preload="metadata" poster="https://w0.peakpx.com/wallpaper/183/933/HD-wallpaper-fifa-world-cup-26-u-sports-soccer-mexico-canada-football-fifa-world-cup-world-cup-2026-we-are-26-sport-event-international-competition-global-event-tournament.jpg"></video>  
+  </div>  
+  
+  <script>  
+    document.addEventListener('DOMContentLoaded', async () => {  
+      shaka.polyfill.installAll();  
+  
+      if (!shaka.Player.isBrowserSupported()) {  
+        console.error('Browser not supported');  
+        return;  
+      }  
+  
+      const video = document.querySelector('video');  
+      const player = new shaka.Player();  
+      await player.attach(video);  
+  
+      const container = document.querySelector('.shaka-video-container');  
+      const ui = new shaka.ui.Overlay(player, container, video);  
+  
+      ui.configure({  
+        controlPanelElements: [  
+          'play_pause', 'time_and_duration', 'mute', 'volume',  
+          'spacer', 'language', 'captions', 'picture_in_picture',  
+          'quality', 'fullscreen'  
+        ],  
+        volumeBarColors: {  
+  base: 'rgba(0, 136, 255, 0.3)',  
+  level: 'rgb(0, 136, 255)'  
+},  
+seekBarColors: {
+  base: 'rgba(90, 0, 0, 0.3)',
+  buffered: 'rgba(120, 0, 0, 0.6)',
+  played: 'rgb(170, 0, 0)'
+}
+      });  
+  
+   
+      let drmConfig = {  
+        clearKeys: {  
+          "d2f828d3d7df71f8f9373d7b99b3f40e":
+ "d4b47f2c87a981afb53e7cb5656ddb3b"  
+        }  
+      };  
+  
+      let streamUrl = "https://sundirectgo-live.pc.cdn.bitgravity.com/svchd18/dth.mpd";  
+  
+      player.configure({  
+        drm: drmConfig,  
+        streaming: {  
+          lowLatencyMode: true,  
+          bufferingGoal: 15,  
+          rebufferingGoal: 2,  
+          bufferBehind: 15,  
+          retryParameters: {  
+            timeout: 10000,  
+            maxAttempts: 5,  
+            baseDelay: 300,  
+            backoffFactor: 1.2  
+          },  
+          segmentRequestTimeout: 8000,  
+          segmentPrefetchLimit: 2,  
+          useNativeHlsOnSafari: true  
+        },  
+        manifest: {  
+          retryParameters: {  
+            timeout: 8000,  
+            maxAttempts: 3  
+          }  
+        }  
+      });  
+  
+      player.addEventListener('error', (event) => {  
+        console.error('Shaka Player Error:', event.detail);  
+      });  
+  
+      try {  
+        await player.load(streamUrl);  
+        console.log("Stream loaded successfully");  
+      } catch (error) {  
+        console.error('Load error:', error);  
+      }  
+    });  
+  </script>  
+  </body>  
 </html>
